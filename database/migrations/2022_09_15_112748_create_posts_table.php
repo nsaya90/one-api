@@ -15,6 +15,10 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_user');
+            $table->integer('like');
+            $table->string('title');
+            $table->string('text');
             $table->timestamps();
         });
     }

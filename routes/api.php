@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+// Création de poste
+// a mettre en place le middleware quand le module de connexion serait pret
+Route::post('/addPost', [PostController::class, 'store'])->name('addPost.store');
+// Modification d'un post
+Route::put('/addPost/{id}', [PostController::class, 'update'])->name('addPost.update');
+// Ajout de photo
+Route::post('/addFile', [PostController::class, 'file'])->name('file.store');
