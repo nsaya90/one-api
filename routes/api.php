@@ -26,4 +26,4 @@ Route::post('/addPost', [PostController::class, 'store'])->name('addPost.store')
 // Modification d'un post
 Route::put('/addPost/{id}', [PostController::class, 'update'])->name('addPost.update');
 // Ajout de photo
-Route::post('/addFile', [PostController::class, 'file'])->name('file.store');
+// Route::post('/addFile', [PostController::class, 'file'])->name('file.store');

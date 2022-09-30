@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -36,13 +38,25 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+
+
+        $filename = time() . '.' . $request->image->extension();
+
+        // chemin des images stocker dans le storage
+        $image = $request->file('image')->storeAs('images', $filename, 'public');
+
+
+
         $post = Post::create([
             'text' => $request['text'],
             'like' => 0,
             'id_user' => $request['id_user'],
             'title' => $request['title'],
+            'image' => $image
 
         ]);
+
+
 
         return response()->json(['post' => $post, 'message' => 'Post publié']);
     }
