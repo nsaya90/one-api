@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('id_user');
             $table->integer('like');
             $table->string('title')->nullable();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->string('text');
             $table->timestamps();
         });

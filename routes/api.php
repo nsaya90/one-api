@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PostController;
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,15 +31,17 @@ Route::post('/register', [Controller::class, 'register'])->name("user.register")
 Route::middleware('auth:sanctum')->get('/user', [Controller::class, 'profile'])->name("user.profile");
 Route::middleware('auth:sanctum')->put('/user', [Controller::class, 'update'])->name("user.update");
 Route::middleware('auth:sanctum')->delete('/user', [Controller::class, 'destroy'])->name("user.destroy");
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
 // Création de poste
 // a mettre en place le middleware quand le module de connexion serait pret
-Route::post('/addPost', [PostController::class, 'store'])->name('addPost.store');
-// Modification d'un post
-Route::put('/addPost/{id}', [PostController::class, 'update'])->name('addPost.update');
+Route::middleware('auth:sanctum')->post('/addPost', [PostController::class, 'store'])->name('addPost.store');
+Route::middleware('auth:sanctum')->get('/addPost', [PostController::class, 'index'])->name('addPost.index');
+Route::put('/addPost/{id}', [PostController::class, 'refresh'])->name('addPost.refresh');
+Route::middleware('auth:sanctum')->get('/addPost/{id}', [PostController::class, 'showPost']);
+
 // Ajout de photo
-// Route::post('/addFile', [PostController::class, 'file'])->name('file.store');
+Route::post('/addFile', [PostController::class, 'file'])->name('file.store');

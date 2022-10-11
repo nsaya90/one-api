@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -15,9 +16,10 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
-        //
+        $list = DB::table('posts')->where('id_user', $id)->get();
+        return response()->json(["list" => $list]);
     }
 
     /**
@@ -38,21 +40,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'text' => ['required', 'string', 'max:255'],
+            'image' => ['image', 'mimes:jpeg,png,jpg,gif,svg'],
+        ]);
 
         $filename = time() . '.' . $request->image->extension();
 
-        // chemin des images stocker dans le storage
+        // // chemin des images stocker dans le storage
         $image = $request->file('image')->storeAs('images', $filename, 'public');
 
-
+        $id_user = Auth::id();
 
         $post = Post::create([
             'text' => $request['text'],
             'like' => 0,
-            'id_user' => $request['id_user'],
             'title' => $request['title'],
-            'image' => $image
+            'image' => $image,
+            'id_user' => $id_user,
+
 
         ]);
 
@@ -67,9 +74,11 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
-        //
+        $id_user = Auth::user();
+        $post = $id_user->post;
+        return response()->json(["message" => "post affiché", 'post' => $post]);
     }
 
     /**
@@ -90,19 +99,33 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function refresh(Request $request, $id)
     {
         // récupérer id du post a modifier
+        $user_id = Auth::id();
 
-        $update_post = Post::find($id);
+        $refresh_post = Post::where([
+            ["id", $id],
+            ["id_user", $user_id]
+        ])->firstOrFail();
 
-        $update_post->title = $request['title'];
-        $update_post->text = $request['text'];
+        $refresh_post->title = $request->title;
+        $refresh_post->text = $request->text;
+        $refresh_post->image = $request->image;
+
+        $refresh_post->save();
+
+        return response()->json(["message" => "post modifié"]);
+
+        // $update_post = Post::whereIn($id);
+
+        // $update_post->title = $request['title'];
+        // $update_post->text = $request['text'];
 
 
-        $update_post->save();
+        // $update_post->save();
 
-        return response()->json(["message" => "Post modifié", 'post' => $update_post]);
+        // return response()->json(["message" => "Post modifié", 'post' => $update_post]);
     }
 
     /**
@@ -111,15 +134,28 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
-    }
+    // public function destro($id)
+    // {
+    //     //
+    // }
 
     public function file(Request $request)
     {
         $result = $request->file('file')->store("apiDocs");
 
         return ["result" => $result];
+    }
+
+    public function showPost($id)
+    {
+
+        $user_id = Auth::id();
+
+        $post = Post::where([
+            ["id", $id],
+            ["id_user", $user_id]
+        ])->firstOrFail();
+
+        return response()->json(["post" => $post]);
     }
 }
